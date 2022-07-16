@@ -12,8 +12,7 @@ class crowd_funding(Client):
     crowd_funding_cli
     """
 
-    def __init__(self, provider, private_key, contract_conf, context, **kwargs):
-
+    def __init__(self, context, **kwargs):
         self._context = context
 
         super(crowd_funding, self).__init__(**kwargs)
