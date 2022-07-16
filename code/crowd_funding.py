@@ -18,7 +18,7 @@ class crowd_funding(Client):
         super(crowd_funding, self).__init__(**kwargs)
 
 
-    def sync_contract_info(self, context):
+    def sync_contract_info(self):
         """
         当前用户的上下文配置，与去中心化的上下文
         """
@@ -34,28 +34,26 @@ class crowd_funding(Client):
         cur_time = time.strftime('%Y-%m-%d %H-%M-%S',time.localtime(time.time()))
         self._context['out_of_date'] = cur_time < self._contract.functions.endTime().call()
 
-        if self._contract.functions.author().call == self._account.address:
+        if self._contract.functions.author().call() == self._account.address:
             self._context['isAuthor'] = True
         else:
             self._context['isAuthor'] = False
-        # TODO: overwrite cur_context
-        context = self._context
 
 
-    def join(self, context):
+    def join(self):
         """
         读者点击参与众筹时调用
         """
         transaction = {
             'from': self._account.address,
             'to': self._contract.functions.author().call(),
-            'value': self._web3.toWei(context['price'], 'ether')
+            'value': self._web3.toWei(self._context['price'], 'ether')
         }
         tx = self.transact(transaction)
-        self.sync_contract_info(context)
+        self.sync_contract_info()
 
 
-    def withdraw(self, context):
+    def withdraw(self):
         """
         赎回
         """
@@ -63,10 +61,10 @@ class crowd_funding(Client):
           'from': self._account.address
         }
         self._contract.functions.withdraw(transaction)
-        self.sync_contract_info(context)
+        self.sync_contract_info()
 
 
-    def withdrawFund(self, context):
+    def withdrawFund(self):
         """
         提取资金
         """
@@ -74,6 +72,6 @@ class crowd_funding(Client):
             'from': self._contract.functions.author().call()
         }
         self._contract.functions.withdrawFund(transaction)
-        self.sync_contract_info(context)
+        self.sync_contract_info()
 
 
